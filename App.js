@@ -9,6 +9,7 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
+import { Button as PButton } from 'react-native-paper';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -19,9 +20,9 @@ export default function App() {
   };
 
   const onPressHandler = () => {
-    setTasks((tasks) => [
-      ...tasks,
-      { id: Date.now(), description: task, done: false },
+    setTasks((previousTask) => [
+      ...previousTask,
+      { id: new Date().toISOString(), description: task, done: false },
     ]);
     setTask("");
   };
@@ -36,6 +37,15 @@ export default function App() {
       })
     );
   };
+
+  const onRemoveTaskHandler = (task) => {
+    setTasks((previousTasks) => {
+      return [...previousTasks.filter(t => t.id !== task.id)];
+    })
+  }
+
+  const onRemoveAllHandler = () => setTasks([]);
+
   return (
     <View style={styles.container}>
       <View style={styles.taskContainer}>
@@ -47,21 +57,34 @@ export default function App() {
             onChangeText={onChangeTextHandler}
             placeholder="Digite sua tarefa aqui"
           />
-          <Button title="Adicionar" onPress={onPressHandler} />
+          <View style={styles.taskItemButtons}>
+            <PButton icon="plus" mode="contained" onPress={onPressHandler}>
+              Adicionar
+            </PButton>
+            <PButton icon="trash-can" mode="contained" onPress={onRemoveAllHandler}>
+              Excluir tudo
+            </PButton>
+          </View>
         </View>
       </View>
       <View style={styles.taskListContainer}>
         <ScrollView>
           {tasks.map((task) => {
             return (
-              <Pressable onPress={() => onClickTaskHandler(task)} key={task.id}>
-                <View style={styles.taskItem(task)}>
-                  <Text style={styles.taskItemText(task)}>
-                    {" "}
-                    {task.description}
-                  </Text>
+              <View style={styles.taskItem(task)} key={task.id}>
+                <Text style={styles.taskItemText(task)}>
+                  {" "}
+                  {task.description}
+                </Text>
+                <View style={styles.taskItemButtons}>
+                  <PButton mode="contained-tonal" onPress={() => onClickTaskHandler(task)}>
+                    {task.done ? 'Para fazer' : 'Concluir'}
+                  </PButton>
+                  <PButton mode="contained-tonal" onPress={() => onRemoveTaskHandler(task)}>
+                    Remover
+                  </PButton>
                 </View>
-              </Pressable>
+              </View>
             );
           })}
         </ScrollView>
@@ -70,6 +93,11 @@ export default function App() {
     </View>
   );
 }
+
+const finishedTask = "darkseagreen";
+const pendingTask = "indianred";
+
+const taskStatus = (task, pending, finished) => task.done ? finished : pending;
 
 const styles = StyleSheet.create({
   container: {
@@ -89,22 +117,31 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",    
+    justifyContent: "center",
     marginBottom: 16,
   },
   taskItem: (task) => ({
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
     borderWidth: 1,
     padding: 16,
     marginLeft: 16,
     marginRight: 16,
     borderRadius: 16,
     marginBottom: 8,
-    borderColor: task.done ? "darkseagreen" : "indianred",
-    backgroundColor: task.done ? "darkseagreen" : "indianred",
+    borderColor: taskStatus(task, pendingTask, finishedTask),
+    backgroundColor: taskStatus(task, pendingTask, finishedTask),
   }),
   taskItemText: (task) => ({
-    textDecorationLine: task.done ? "line-through" : "none",
+    marginTop: 10,
+    textDecorationLine: taskStatus(task, 'none', "line-through"),
+    marginLeft: 10,
   }),
+  taskItemButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
   taskInput: {
     borderWidth: 1,
     borderColor: "red",
