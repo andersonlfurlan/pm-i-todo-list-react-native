@@ -1,121 +1,135 @@
 import { useState } from "react";
-import { StatusBar } from "expo-status-bar";
+import { ScrollView, View, StyleSheet } from "react-native";
 import {
-  StyleSheet,
+  Provider as PaperProvider,
   Text,
-  View,
   TextInput,
   Button,
-  ScrollView,
-  Pressable,
-} from "react-native";
+  Card,
+  IconButton,
+} from "react-native-paper";
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState("");
 
-  const onChangeTextHandler = (task) => {
-    setTask(task);
+  const addTask = () => {
+    if (task.trim() !== "") {
+      setTasks([...tasks, { id: Date.now(), description: task, done: false }]);
+      setTask("");
+    }
   };
 
-  const onPressHandler = () => {
-    setTasks((tasks) => [
-      ...tasks,
-      { id: Date.now(), description: task, done: false },
-    ]);
-    setTask("");
-  };
-
-  const onClickTaskHandler = (task) => {
+  const toggleTask = (taskToToggle) => {
     setTasks((currentTasks) =>
-      currentTasks.map((t) => {
-        if (t.id === task.id) {
-          t.done = !t.done;
-        }
-        return t;
-      })
+      currentTasks.map((t) =>
+        t.id === taskToToggle.id ? { ...t, done: !t.done } : t
+      )
     );
   };
+
+  const deleteTask = (taskToDelete) => {
+    setTasks((currentTasks) =>
+      currentTasks.filter((t) => t.id !== taskToDelete.id)
+    );
+  };
+
+  const deleteAllTasks = () => {
+    setTasks([]);
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.taskContainer}>
-        <Text style={styles.title}>Minhas Tarefas</Text>
-        <View style={styles.taskInputContainer}>
+    <PaperProvider>
+      <View style={styles.container}>
+        <Text variant="headlineMedium" style={styles.title}>
+          Minhas Tarefas
+        </Text>
+
+        <View style={styles.inputRow}>
           <TextInput
-            style={styles.taskInput}
+            label="Digite sua tarefa"
+            mode="outlined"
             value={task}
-            onChangeText={onChangeTextHandler}
-            placeholder="Digite sua tarefa aqui"
+            onChangeText={setTask}
+            style={styles.input}
           />
-          <Button title="Adicionar" onPress={onPressHandler} />
+          <Button mode="contained" onPress={addTask} style={styles.button}>
+            Adicionar
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={deleteAllTasks}
+            style={styles.button}
+            textColor="red"
+          >
+            Excluir todas
+          </Button>
         </View>
-      </View>
-      <View style={styles.taskListContainer}>
-        <ScrollView>
-          {tasks.map((task) => {
-            return (
-              <Pressable onPress={() => onClickTaskHandler(task)} key={task.id}>
-                <View style={styles.taskItem(task)}>
-                  <Text style={styles.taskItemText(task)}>
-                    {" "}
-                    {task.description}
-                  </Text>
-                </View>
-              </Pressable>
-            );
-          })}
+
+        <ScrollView style={styles.taskList}>
+          {tasks.map((t) => (
+            <Card
+              key={t.id}
+              style={{
+                margin: 8,
+                backgroundColor: t.done ? "#c8e6c9" : "#ffcdd2",
+              }}
+            >
+              <Card.Title
+                title={t.description}
+                titleStyle={{
+                  textDecorationLine: t.done ? "line-through" : "none",
+                }}
+                right={(props) => (
+                  <View style={{ flexDirection: "row" }}>
+                    <IconButton
+                      {...props}
+                      icon={t.done ? "check-circle-outline" : "check"}
+                      onPress={() => toggleTask(t)}
+                    />
+                    <IconButton
+                      {...props}
+                      icon="delete"
+                      onPress={() => deleteTask(t)}
+                      iconColor="red"
+                    />
+                  </View>
+                )}
+              />
+            </Card>
+          ))}
         </ScrollView>
       </View>
-      <StatusBar style="auto" />
-    </View>
+    </PaperProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  taskContainer: {
-    paddingTop: 32,
-    backgroundColor: "lightblue",
+    paddingTop: 48,
+    paddingHorizontal: 16,
+    backgroundColor: "#f5f5f5",
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
     textAlign: "center",
     marginBottom: 16,
   },
-  taskInputContainer: {
-    flex: 1,
+  inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",    
-    marginBottom: 16,
+    gap: 8,
+    flexWrap: "wrap",
+    justifyContent: "center",
   },
-  taskItem: (task) => ({
-    borderWidth: 1,
-    padding: 16,
-    marginLeft: 16,
-    marginRight: 16,
-    borderRadius: 16,
-    marginBottom: 8,
-    borderColor: task.done ? "darkseagreen" : "indianred",
-    backgroundColor: task.done ? "darkseagreen" : "indianred",
-  }),
-  taskItemText: (task) => ({
-    textDecorationLine: task.done ? "line-through" : "none",
-  }),
-  taskInput: {
-    borderWidth: 1,
-    borderColor: "red",
-    width: "60%",
-    marginEnd: 8,
-    padding: 8,
-    borderRadius: 10,
+  input: {
+    flexGrow: 1,
+    minWidth: "55%",
   },
-  taskListContainer: {
-    backgroundColor: "lightyellow",
-    flex: 6,
-    paddingTop: 16,
+  button: {
+    marginVertical: 8,
+  },
+  taskList: {
+    marginTop: 16,
   },
 });
