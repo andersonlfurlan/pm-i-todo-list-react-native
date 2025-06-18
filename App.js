@@ -1,96 +1,25 @@
-import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
   View,
-  TextInput,
-  Button,
-  ScrollView,
-  Pressable,
 } from "react-native";
-import { Button as PButton } from 'react-native-paper';
+import { TaskContextProvider } from "./contexts/TaskContext";
+import TaskList from "./components/TaskList";
+import TaskRegister from "./components/TaskRegister";
 
 export default function App() {
-  const [tasks, setTasks] = useState([]);
-  const [task, setTask] = useState("");
-
-  const onChangeTextHandler = (task) => {
-    setTask(task);
-  };
-
-  const onPressHandler = () => {
-    setTasks((previousTask) => [
-      ...previousTask,
-      { id: new Date().toISOString(), description: task, done: false },
-    ]);
-    setTask("");
-  };
-
-  const onClickTaskHandler = (task) => {
-    setTasks((currentTasks) =>
-      currentTasks.map((t) => {
-        if (t.id === task.id) {
-          t.done = !t.done;
-        }
-        return t;
-      })
-    );
-  };
-
-  const onRemoveTaskHandler = (task) => {
-    setTasks((previousTasks) => {
-      return [...previousTasks.filter(t => t.id !== task.id)];
-    })
-  }
-
-  const onRemoveAllHandler = () => setTasks([]);
-
   return (
-    <View style={styles.container}>
-      <View style={styles.taskContainer}>
-        <Text style={styles.title}>Minhas Tarefas</Text>
-        <View style={styles.taskInputContainer}>
-          <TextInput
-            style={styles.taskInput}
-            value={task}
-            onChangeText={onChangeTextHandler}
-            placeholder="Digite sua tarefa aqui"
-          />
-          <View style={styles.taskItemButtons}>
-            <PButton icon="plus" mode="contained" onPress={onPressHandler}>
-              Adicionar
-            </PButton>
-            <PButton icon="trash-can" mode="contained" onPress={onRemoveAllHandler}>
-              Excluir tudo
-            </PButton>
-          </View>
+    <TaskContextProvider>
+      <View style={styles.container}>
+        <View style={styles.taskContainer}>
+          <Text style={styles.title}>Minhas Tarefas</Text>
+          <TaskRegister />
         </View>
+        <TaskList />
+        <StatusBar style="auto" />
       </View>
-      <View style={styles.taskListContainer}>
-        <ScrollView>
-          {tasks.map((task) => {
-            return (
-              <View style={styles.taskItem(task)} key={task.id}>
-                <Text style={styles.taskItemText(task)}>
-                  {" "}
-                  {task.description}
-                </Text>
-                <View style={styles.taskItemButtons}>
-                  <PButton mode="contained-tonal" onPress={() => onClickTaskHandler(task)}>
-                    {task.done ? 'Para fazer' : 'Concluir'}
-                  </PButton>
-                  <PButton mode="contained-tonal" onPress={() => onRemoveTaskHandler(task)}>
-                    Remover
-                  </PButton>
-                </View>
-              </View>
-            );
-          })}
-        </ScrollView>
-      </View>
-      <StatusBar style="auto" />
-    </View>
+    </TaskContextProvider>
   );
 }
 
@@ -99,7 +28,7 @@ const pendingTask = "indianred";
 
 const taskStatus = (task, pending, finished) => task.done ? finished : pending;
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
