@@ -1,11 +1,11 @@
 import { View, ScrollView, Text } from "react-native";
 import { styles } from "../App";
-import { useContext } from "react";
-import { TaskContext } from "../contexts/TaskContext";
+import { useTaskContext } from "../contexts/TaskContext";
 import { Button as PButton } from "react-native-paper";
 
 export default function TaskList() {
-  const tasksContext = useContext(TaskContext);
+
+  const tasksContext = useTaskContext();
 
   const onClickTaskHandler = (task) => {
     tasksContext.finishTask(task);

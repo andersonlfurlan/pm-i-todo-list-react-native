@@ -1,12 +1,12 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { styles } from "../App";
 import { View, TextInput } from "react-native";
 import { Button as PButton } from "react-native-paper";
-import { TaskContext } from "../contexts/TaskContext";
+import { useTaskContext } from "../contexts/TaskContext";
 
 export default function TaskRegister() {
   const [task, setTask] = useState("");
-  const tasksContext = useContext(TaskContext);
+  const tasksContext = useTaskContext();
 
   const onChangeTextHandler = (task) => {
     setTask(task);

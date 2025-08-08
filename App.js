@@ -7,18 +7,33 @@ import {
 import { TaskContextProvider } from "./contexts/TaskContext";
 import TaskList from "./components/TaskList";
 import TaskRegister from "./components/TaskRegister";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import TaskListScreen from './screens/TaskListScreen';
+import TaskFormScreen from './screens/TaskFormScreen';
+import TaskHomeScreen from "./screens/TaskHomeScreen";
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <TaskContextProvider>
-      <View style={styles.container}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="TaskHome">
+          <Stack.Screen name="TaskHome" component={TaskHomeScreen}></Stack.Screen>
+          <Stack.Screen name="TaskList" component={TaskListScreen}></Stack.Screen>
+          <Stack.Screen name="TaskForm" component={TaskFormScreen}></Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
+
+      {/* <View style={styles.container}>
         <View style={styles.taskContainer}>
           <Text style={styles.title}>Minhas Tarefas</Text>
           <TaskRegister />
         </View>
         <TaskList />
         <StatusBar style="auto" />
-      </View>
+      </View> */}
     </TaskContextProvider>
   );
 }

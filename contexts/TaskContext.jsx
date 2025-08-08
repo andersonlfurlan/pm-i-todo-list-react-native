@@ -1,11 +1,11 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useContext } from "react";
 
 export const TaskContext = createContext({
   tasks: [],
-  addTask: (task) => {},
-  finishTask: (task) => {},
-  removeTask: (task) => {},
-  clearTasks: () => {},
+  addTask: (task) => { },
+  finishTask: (task) => { },
+  removeTask: (task) => { },
+  clearTasks: () => { },
 });
 
 export const TaskContextProvider = ({ children }) => {
@@ -32,9 +32,9 @@ export const TaskContextProvider = ({ children }) => {
         ...prevTasks.map((t) => {
           return t.id === task.id
             ? {
-                ...task,
-                done: !task.done,
-              }
+              ...task,
+              done: !task.done,
+            }
             : t;
         }),
       ];
@@ -51,3 +51,7 @@ export const TaskContextProvider = ({ children }) => {
     </TaskContext.Provider>
   );
 };
+
+export const useTaskContext = () => {
+  return useContext(TaskContext);
+}
