@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { styles } from "../App";
-import { View, TextInput } from "react-native";
+import { View, TextInput, StyleSheet } from "react-native";
 import { Button as PButton } from "react-native-paper";
 import { useTaskContext } from "../contexts/TaskContext";
+import { globalStyles } from "../styles/globalStyles";
 
 export default function TaskRegister() {
   const [task, setTask] = useState("");
@@ -21,7 +21,6 @@ export default function TaskRegister() {
     setTask("");
   };
 
-  const onRemoveAllHandler = () => tasksContext.clearTasks();
 
   return (
     <View style={styles.taskInputContainer}>
@@ -31,14 +30,30 @@ export default function TaskRegister() {
         onChangeText={onChangeTextHandler}
         placeholder="Digite sua tarefa aqui"
       />
-      <View style={styles.taskItemButtons}>
+      <View style={globalStyles.taskItemButtons}>
         <PButton icon="plus" mode="contained" onPress={onPressHandler}>
           Adicionar
-        </PButton>
-        <PButton icon="trash-can" mode="contained" onPress={onRemoveAllHandler}>
-          Excluir tudo
         </PButton>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  taskInputContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+
+  taskInput: {
+    borderWidth: 1,
+    borderColor: "red",
+    width: "60%",
+    marginEnd: 8,
+    padding: 8,
+    borderRadius: 10,
+  },
+})
