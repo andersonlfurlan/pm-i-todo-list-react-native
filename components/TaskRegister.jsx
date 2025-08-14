@@ -3,10 +3,12 @@ import { View, TextInput, StyleSheet } from "react-native";
 import { Button as PButton } from "react-native-paper";
 import { useTaskContext } from "../contexts/TaskContext";
 import { globalStyles } from "../styles/globalStyles";
+import { useNavigation } from "@react-navigation/native";
 
 export default function TaskRegister() {
   const [task, setTask] = useState("");
   const tasksContext = useTaskContext();
+  const navigation = useNavigation();
 
   const onChangeTextHandler = (task) => {
     setTask(task);
@@ -19,6 +21,7 @@ export default function TaskRegister() {
       done: false,
     });
     setTask("");
+    navigation.navigate('TaskList');
   };
 
 

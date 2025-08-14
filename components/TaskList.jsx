@@ -3,9 +3,10 @@ import { useTaskContext } from "../contexts/TaskContext";
 import { Button as PButton } from "react-native-paper";
 
 import { globalStyles } from "../styles/globalStyles.jsx";
+import { useNavigation } from "@react-navigation/native";
 
 export default function TaskList() {
-
+  const navigation = useNavigation();
   const tasksContext = useTaskContext();
 
   const onClickTaskHandler = (task) => {
@@ -21,6 +22,11 @@ export default function TaskList() {
   return (
     <>
       <View style={styles.removeAllContainer}>
+        <PButton icon="plus" mode="contained" onPress={
+          () => navigation.navigate('TaskForm')
+        }>
+          Adicionar
+        </PButton>
         <PButton icon="trash-can" mode="contained" onPress={onRemoveAllHandler}>
           Excluir tudo
         </PButton>
@@ -84,5 +90,8 @@ const styles = StyleSheet.create({
   },
   removeAllContainer: {
     padding: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10
   }
 })
