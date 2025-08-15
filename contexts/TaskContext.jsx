@@ -10,13 +10,22 @@ export const TaskContext = createContext({
 
 export const TaskContextProvider = ({ children }) => {
   const [tasks, setTasks] = useState([
-    { id: new Date().toISOString(), description: "task", done: false },
+    {
+      id: new Date().toISOString(),
+      name: 'Tarefa 1',
+      description: "Descrição da tarefa 1",
+      done: false,
+      createdDate: new Date(),
+    },
   ]);
 
   const addTask = (task) => {
     console.log("new task: ", task);
     setTasks((prevTasks) => {
-      return [...prevTasks, task];
+      return [...prevTasks, {
+        ...task,
+        createdDate: new Date(),
+      }];
     });
   };
 
@@ -34,6 +43,7 @@ export const TaskContextProvider = ({ children }) => {
             ? {
               ...task,
               done: !task.done,
+              completedDate: new Date(),
             }
             : t;
         }),

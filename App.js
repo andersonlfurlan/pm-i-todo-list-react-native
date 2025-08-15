@@ -12,6 +12,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TaskListScreen from './screens/TaskListScreen';
 import TaskFormScreen from './screens/TaskFormScreen';
 import TaskHomeScreen from "./screens/TaskHomeScreen";
+import TaskDetailScreen from "./screens/TaskDetailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
           <Stack.Screen name="TaskHome" component={TaskHomeScreen}></Stack.Screen>
           <Stack.Screen name="TaskList" component={TaskListScreen}></Stack.Screen>
           <Stack.Screen name="TaskForm" component={TaskFormScreen}></Stack.Screen>
+          <Stack.Screen name="TaskDetail" component={TaskDetailScreen}></Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </TaskContextProvider>

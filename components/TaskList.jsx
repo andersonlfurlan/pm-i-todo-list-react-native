@@ -17,6 +17,12 @@ export default function TaskList() {
     tasksContext.removeTask(task);
   };
 
+  const onClickDetailHandler = (task) => {
+    navigation.navigate('TaskDetail', {
+      task,
+    })
+  }
+
   const onRemoveAllHandler = () => tasksContext.clearTasks();
 
   return (
@@ -36,8 +42,13 @@ export default function TaskList() {
           {tasksContext.tasks.map((task) => {
             return (
               <View style={styles.taskItem(task)} key={task.id}>
-                <Text style={styles.taskItemText(task)}> {task.description}</Text>
+                <Text style={styles.taskItemText(task)}> {task.name}</Text>
                 <View style={globalStyles.taskItemButtons}>
+                  <PButton
+                    mode="contained-tonal"
+                    onPress={() => onClickDetailHandler(task)}>
+                    Detalhes
+                  </PButton>
                   <PButton
                     mode="contained-tonal"
                     onPress={() => onClickTaskHandler(task)}

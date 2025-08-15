@@ -1,38 +1,55 @@
 import { useState } from "react";
-import { View, TextInput, StyleSheet } from "react-native";
+import { View, StyleSheet, TextInput } from "react-native";
 import { Button as PButton } from "react-native-paper";
 import { useTaskContext } from "../contexts/TaskContext";
 import { globalStyles } from "../styles/globalStyles";
 import { useNavigation } from "@react-navigation/native";
 
 export default function TaskRegister() {
-  const [task, setTask] = useState("");
+  const [taskName, setTaskName] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
   const tasksContext = useTaskContext();
   const navigation = useNavigation();
 
-  const onChangeTextHandler = (task) => {
-    setTask(task);
+  const onChangeNameHandler = (name) => {
+    setTaskName(name);
+  };
+
+  const onChangeDescriptionHandler = (description) => {
+    setTaskDescription(description);
   };
 
   const onPressHandler = () => {
     tasksContext.addTask({
       id: new Date().toISOString(),
-      description: task,
+      name: taskName,
+      description: taskDescription,
       done: false,
+      createdDate: new Date().toISOString(),
     });
-    setTask("");
+    setTaskName("");
+    setTaskDescription("");
     navigation.navigate('TaskList');
   };
 
-
   return (
-    <View style={styles.taskInputContainer}>
-      <TextInput
-        style={styles.taskInput}
-        value={task}
-        onChangeText={onChangeTextHandler}
-        placeholder="Digite sua tarefa aqui"
-      />
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.taskInput}
+          value={taskName}
+          onChangeText={onChangeNameHandler}
+          placeholder="Digite o nome da tarefa"
+        />
+        <TextInput
+          style={styles.taskInput}
+          value={taskDescription}
+          onChangeText={onChangeDescriptionHandler}
+          placeholder="Digite a descrição da tarefa"
+          multiline
+          numberOfLines={3}
+        />
+      </View>
       <View style={globalStyles.taskItemButtons}>
         <PButton icon="plus" mode="contained" onPress={onPressHandler}>
           Adicionar
@@ -43,20 +60,21 @@ export default function TaskRegister() {
 }
 
 const styles = StyleSheet.create({
-  taskInputContainer: {
+  container: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
   },
-
+  inputContainer: {
+    marginBottom: 16,
+    gap: 12,
+  },
   taskInput: {
     borderWidth: 1,
-    borderColor: "red",
-    width: "60%",
-    marginEnd: 8,
-    padding: 8,
+    borderColor: '#e0e0e0',
+    backgroundColor: '#ffffff',
+    padding: 12,
     borderRadius: 10,
+    fontSize: 16,
   },
-})
+});
