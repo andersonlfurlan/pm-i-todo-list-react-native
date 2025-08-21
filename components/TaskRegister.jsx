@@ -21,11 +21,9 @@ export default function TaskRegister() {
 
   const onPressHandler = () => {
     tasksContext.addTask({
-      id: new Date().toISOString(),
       name: taskName,
       description: taskDescription,
       done: false,
-      createdDate: new Date().toISOString(),
     });
     setTaskName("");
     setTaskDescription("");

@@ -1,4 +1,6 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
+
+import taskService from '../services/taskService';
 
 export const TaskContext = createContext({
   tasks: [],
@@ -9,24 +11,32 @@ export const TaskContext = createContext({
 });
 
 export const TaskContextProvider = ({ children }) => {
-  const [tasks, setTasks] = useState([
-    {
-      id: new Date().toISOString(),
-      name: 'Tarefa 1',
-      description: "Descrição da tarefa 1",
-      done: false,
-      createdDate: new Date(),
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
 
-  const addTask = (task) => {
-    console.log("new task: ", task);
-    setTasks((prevTasks) => {
-      return [...prevTasks, {
-        ...task,
-        createdDate: new Date(),
-      }];
-    });
+  useEffect(() => {
+    // taskService
+    //   .getTasks()
+    //   .then(response => {
+    //     setTasks(response);
+    //   });
+    const loadTasks = async () => {
+      const response = await taskService.getTasks();
+      setTasks(response);
+    };
+    loadTasks();
+  }, [])
+
+  const addTask = async (task) => {
+    task.id = new Date().toISOString();
+    task.createdDate = new Date();
+
+    if (await taskService.addTask(task)) {
+      setTasks((prevTasks) => {
+        return [...prevTasks, {
+          ...task,
+        }];
+      });
+    }
   };
 
   const removeTask = (task) => {
