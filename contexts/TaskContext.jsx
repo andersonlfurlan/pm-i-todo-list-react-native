@@ -1,62 +1,55 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
+import taskService from "../services/taskService.js";
 
 export const TaskContext = createContext({
   tasks: [],
-  addTask: (task) => { },
-  finishTask: (task) => { },
-  removeTask: (task) => { },
-  clearTasks: () => { },
+  addTask: (task) => {},
+  finishTask: (task) => {},
+  removeTask: (task) => {},
+  clearTasks: () => {},
 });
 
 export const TaskContextProvider = ({ children }) => {
-  const [tasks, setTasks] = useState([
-    {
-      id: new Date().toISOString(),
-      name: 'Tarefa 1',
-      description: "Descrição da tarefa 1",
-      done: false,
-      createdDate: new Date(),
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
+  const [refresh, setRefresh] = useState(false);
 
-  const addTask = (task) => {
-    console.log("new task: ", task);
-    setTasks((prevTasks) => {
-      return [...prevTasks, {
-        ...task,
-        createdDate: new Date(),
-      }];
-    });
+  useEffect(() => {
+    (async () => {
+      console.log("Fetching tasks from service...");
+      const data = await taskService.getTasks();
+      console.log("Tasks fetched:", data);
+      setTasks(data);
+    })();
+  }, [refresh]);
+
+  const refreshList = () => {
+    setRefresh((refresh) => !refresh);
   };
 
-  const removeTask = (task) => {
-    setTasks((prevTasks) => {
-      return prevTasks.filter((t) => t.id !== task.id);
-    });
+  const addTask = async (task) => {
+    await taskService.addTask(task);
+    refreshList();
   };
 
-  const finishTask = (task) => {
-    setTasks((prevTasks) => {
-      return [
-        ...prevTasks.map((t) => {
-          return t.id === task.id
-            ? {
-              ...task,
-              done: !task.done,
-              completedDate: new Date(),
-            }
-            : t;
-        }),
-      ];
-    });
+  const removeTask = async (task) => {
+    await taskService.removeTask(task);
+    refreshList();
   };
 
-  const clearTasks = () => {
-    setTasks([]);
+  const finishTask = async (task) => {''
+    await taskService.finishTask(task);
+    refreshList();
+  };
+
+  const clearTasks = async () => {
+    await taskService.clearTasks();
+    refreshList();
   };
 
   return (
-    <TaskContext.Provider value={{ tasks, addTask, removeTask, finishTask, clearTasks }}>
+    <TaskContext.Provider
+      value={{ tasks, addTask, removeTask, finishTask, clearTasks }}
+    >
       {children}
     </TaskContext.Provider>
   );
@@ -64,4 +57,4 @@ export const TaskContextProvider = ({ children }) => {
 
 export const useTaskContext = () => {
   return useContext(TaskContext);
-}
+};
