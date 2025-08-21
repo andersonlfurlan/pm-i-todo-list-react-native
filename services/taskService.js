@@ -7,6 +7,10 @@ const getTasks = async () => {
   return data ? JSON.parse(data) : [];
 };
 
+const setTasks = async (tasks) => {
+  await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+};
+
 const addTask = async (task) => {
   const currentTasks = await getTasks();
   const updatedTasks = [...currentTasks, { ...task, createdDate: new Date() }];
@@ -37,6 +41,7 @@ const taskService = {
   removeTask,
   finishTask,
   clearTasks,
+  setTasks
 };
 
 export default taskService;

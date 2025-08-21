@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
 import { Button as PButton } from "react-native-paper";
-import { useTaskContext } from "../contexts/TaskContext";
 import { globalStyles } from "../styles/globalStyles";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { addTask } from "../store/taskSlice";
 
 export default function TaskRegister() {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
-  const tasksContext = useTaskContext();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const onChangeNameHandler = (name) => {
     setTaskName(name);
@@ -20,16 +21,18 @@ export default function TaskRegister() {
   };
 
   const onPressHandler = () => {
-    tasksContext.addTask({
-      id: new Date().toISOString(),
-      name: taskName,
-      description: taskDescription,
-      done: false,
-      createdDate: new Date().toISOString(),
-    });
+    dispatch(
+      addTask({
+        id: new Date().toISOString(),
+        name: taskName,
+        description: taskDescription,
+        done: false,
+        createdDate: new Date().toISOString(),
+      })
+    );
     setTaskName("");
     setTaskDescription("");
-    navigation.navigate('TaskList');
+    navigation.navigate("TaskList");
   };
 
   return (
@@ -63,7 +66,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   inputContainer: {
     marginBottom: 16,
@@ -71,8 +74,8 @@ const styles = StyleSheet.create({
   },
   taskInput: {
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    backgroundColor: '#ffffff',
+    borderColor: "#e0e0e0",
+    backgroundColor: "#ffffff",
     padding: 12,
     borderRadius: 10,
     fontSize: 16,
