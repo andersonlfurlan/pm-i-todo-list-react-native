@@ -34,16 +34,21 @@ const addTask = async (newTask) => {
     }
 }
 
-const removeTask = () => {
-
+const removeTask = async (task) => {
+    const currentTasks = await getTasks();
+    const newValue = currentTasks.filter(t => t.id !== task.id);
+    await AsyncStorage.setItem(key, JSON.stringify(newValue));
+    return newValue;
 }
 
-const finishTask = () => {
-
+const finishTask = async (taskDone) => {
+    const currentTasks = await getTasks();
+    const newValue = currentTasks.map(t => t.id === taskDone.id ? taskDone : t);
+    await AsyncStorage.setItem(key, JSON.stringify(newValue));
 }
 
 const clearTasks = () => {
-
+    AsyncStorage.removeItem(key);
 }
 
 export default {

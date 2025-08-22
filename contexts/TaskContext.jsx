@@ -39,30 +39,36 @@ export const TaskContextProvider = ({ children }) => {
     }
   };
 
-  const removeTask = (task) => {
+  const removeTask = async (task) => {
     setTasks((prevTasks) => {
       return prevTasks.filter((t) => t.id !== task.id);
     });
+    await taskService.removeTask(task);
   };
 
-  const finishTask = (task) => {
+  const finishTask = async (taskToBeDone) => {
+    taskToBeDone.done = !taskToBeDone.done;
+    if (taskToBeDone.done) {
+      taskToBeDone.completedDate = new Date();
+    } else {
+      delete taskToBeDone.completedDate;
+    }
+
     setTasks((prevTasks) => {
       return [
         ...prevTasks.map((t) => {
-          return t.id === task.id
-            ? {
-              ...task,
-              done: !task.done,
-              completedDate: new Date(),
-            }
+          return t.id === taskToBeDone.id
+            ? taskToBeDone
             : t;
         }),
       ];
     });
+    await taskService.finishTask(taskToBeDone);
   };
 
   const clearTasks = () => {
     setTasks([]);
+    taskService.clearTasks();
   };
 
   return (
