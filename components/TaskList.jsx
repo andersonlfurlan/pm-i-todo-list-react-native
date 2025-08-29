@@ -4,10 +4,27 @@ import { Button as PButton } from "react-native-paper";
 
 import { globalStyles } from "../styles/globalStyles.jsx";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { initTasks, selectTasks } from '../store/features/taskSlice.js'
+import { useEffect } from "react";
+import taskService from "../services/taskService.js";
 
 export default function TaskList() {
   const navigation = useNavigation();
   const tasksContext = useTaskContext();
+  const tasks = useSelector(selectTasks);
+  const dispatch = useDispatch();
+  console.log('tasks: ', tasks);
+
+  useEffect(() => {
+    const loadTasks = async () => {
+      const storedTasks = await taskService.getTasks();
+      console.log('storedTasks: ', storedTasks);
+      dispatch(initTasks(storedTasks)); 
+    };
+    loadTasks();
+  }, []);
+
 
   const onClickTaskHandler = (task) => {
     tasksContext.finishTask(task);
@@ -39,7 +56,7 @@ export default function TaskList() {
       </View>
       <View style={styles.taskListContainer}>
         <ScrollView>
-          {tasksContext.tasks.map((task) => {
+          {tasks.map((task) => {
             return (
               <View style={styles.taskItem(task)} key={task.id}>
                 <Text style={styles.taskItemText(task)}> {task.name}</Text>

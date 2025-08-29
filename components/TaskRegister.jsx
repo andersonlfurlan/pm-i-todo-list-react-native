@@ -4,12 +4,15 @@ import { Button as PButton } from "react-native-paper";
 import { useTaskContext } from "../contexts/TaskContext";
 import { globalStyles } from "../styles/globalStyles";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { addTask } from "../store/features/taskSlice";
 
 export default function TaskRegister() {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const tasksContext = useTaskContext();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const onChangeNameHandler = (name) => {
     setTaskName(name);
@@ -20,11 +23,12 @@ export default function TaskRegister() {
   };
 
   const onPressHandler = () => {
-    tasksContext.addTask({
+    const newTask = {
       name: taskName,
       description: taskDescription,
       done: false,
-    });
+    };
+    dispatch(addTask(newTask));
     setTaskName("");
     setTaskDescription("");
     navigation.navigate('TaskList');

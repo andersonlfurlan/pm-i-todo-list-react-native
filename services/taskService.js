@@ -15,7 +15,7 @@ const getTasks = async () => {
     //     })
     try {
         const tasks = await AsyncStorage.getItem(key);
-        return JSON.parse(tasks) || [];
+        return JSON.parse(tasks) || { tasks: [] };
     } catch (error) {
         console.error(error);
         return [];
