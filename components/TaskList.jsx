@@ -1,37 +1,26 @@
 import { View, ScrollView, Text, StyleSheet } from "react-native";
-import { useTaskContext } from "../contexts/TaskContext";
 import { Button as PButton } from "react-native-paper";
-
 import { globalStyles } from "../styles/globalStyles.jsx";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { initTasks, selectTasks } from '../store/features/taskSlice.js'
 import { useEffect } from "react";
-import taskService from "../services/taskService.js";
+import { fetchTasks, removeTaskAsync, finishTaskAsync, clearAllTasksAsync, selectTasks } from '../store/features/taskSlice.js';
 
 export default function TaskList() {
   const navigation = useNavigation();
-  const tasksContext = useTaskContext();
   const tasks = useSelector(selectTasks);
   const dispatch = useDispatch();
-  console.log('tasks: ', tasks);
-
   useEffect(() => {
-    const loadTasks = async () => {
-      const storedTasks = await taskService.getTasks();
-      console.log('storedTasks: ', storedTasks);
-      dispatch(initTasks(storedTasks)); 
-    };
-    loadTasks();
-  }, []);
+    dispatch(fetchTasks());
+  }, [dispatch]);
 
 
   const onClickTaskHandler = (task) => {
-    tasksContext.finishTask(task);
+    dispatch(finishTaskAsync({ ...task, done: !task.done }));
   };
 
   const onRemoveTaskHandler = (task) => {
-    tasksContext.removeTask(task);
+    dispatch(removeTaskAsync(task));
   };
 
   const onClickDetailHandler = (task) => {
@@ -40,7 +29,9 @@ export default function TaskList() {
     })
   }
 
-  const onRemoveAllHandler = () => tasksContext.clearTasks();
+  const onRemoveAllHandler = () => {
+    dispatch(clearAllTasksAsync());
+  };
 
   return (
     <>

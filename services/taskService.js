@@ -1,60 +1,70 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
-const key = '@TASKS';
+const API_URL = "http://localhost:3000/tasks";
 
 const getTasks = async () => {
-    // return AsyncStorage
-    //     .getItem(key)
-    //     .then(tasks => {
-    //         console.log('getTasks: ', tasks);
-    //         return JSON.parse(tasks) || [];
-    //     })
-    //     .catch(error => {
-    //         console.error(error);
-    //         return [];
-    //     })
-    try {
-        const tasks = await AsyncStorage.getItem(key);
-        return JSON.parse(tasks) || { tasks: [] };
-    } catch (error) {
-        console.error(error);
-        return [];
-    }
-}
+  try {
+    const response = await axios.get(API_URL);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
 
 const addTask = async (newTask) => {
-    const currentTasks = await getTasks();
-    try {
-        const value = JSON.stringify([...currentTasks, newTask]);
-        await AsyncStorage.setItem(key, value);
-        return true;
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-}
+  try {
+    const response = await axios.post(API_URL, {
+      ...newTask,
+      createdDate: new Date().toISOString(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 
 const removeTask = async (task) => {
-    const currentTasks = await getTasks();
-    const newValue = currentTasks.filter(t => t.id !== task.id);
-    await AsyncStorage.setItem(key, JSON.stringify(newValue));
-    return newValue;
-}
+  try {
+    await axios.delete(`${API_URL}/${task.id}`);
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 
 const finishTask = async (taskDone) => {
-    const currentTasks = await getTasks();
-    const newValue = currentTasks.map(t => t.id === taskDone.id ? taskDone : t);
-    await AsyncStorage.setItem(key, JSON.stringify(newValue));
-}
+  try {
+    const response = await axios.put(`${API_URL}/${taskDone.id}`, {
+      ...taskDone,
+      completedDate: new Date().toISOString(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 
-const clearTasks = () => {
-    AsyncStorage.removeItem(key);
-}
+const clearTasks = async () => {
+  try {
+    const tasks = await getTasks();
+    await Promise.all(
+      tasks.map((task) => axios.delete(`${API_URL}/${task.id}`))
+    );
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 
 export default {
-    getTasks,
-    addTask,
-    removeTask,
-    finishTask,
-    clearTasks
+  getTasks,
+  addTask,
+  removeTask,
+  finishTask,
+  clearTasks,
 };

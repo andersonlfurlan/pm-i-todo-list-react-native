@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
 import { Button as PButton } from "react-native-paper";
-import { useTaskContext } from "../contexts/TaskContext";
 import { globalStyles } from "../styles/globalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { addTask } from "../store/features/taskSlice";
+import { addTaskAsync } from "../store/features/taskSlice";
 
 export default function TaskRegister() {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
-  const tasksContext = useTaskContext();
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -28,7 +26,7 @@ export default function TaskRegister() {
       description: taskDescription,
       done: false,
     };
-    dispatch(addTask(newTask));
+    dispatch(addTaskAsync(newTask));
     setTaskName("");
     setTaskDescription("");
     navigation.navigate('TaskList');
