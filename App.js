@@ -14,15 +14,15 @@ import TaskFormScreen from './screens/TaskFormScreen';
 import TaskHomeScreen from "./screens/TaskHomeScreen";
 import TaskDetailScreen from "./screens/TaskDetailScreen";
 
-import { Provider as ReduxProvider } from "react-redux";
+import { Provider as ReduxProvider, useDispatch } from "react-redux";
 import { store } from './store/index';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+
   return (
     <ReduxProvider store={store}>
-      <TaskContextProvider>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="TaskHome">
             <Stack.Screen name="TaskHome" component={TaskHomeScreen}></Stack.Screen>
@@ -31,7 +31,6 @@ export default function App() {
             <Stack.Screen name="TaskDetail" component={TaskDetailScreen}></Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
-      </TaskContextProvider>
     </ReduxProvider>
   );
 }
