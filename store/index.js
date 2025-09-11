@@ -8,7 +8,7 @@ export const store = configureStore({
     }
 });
 
-store.subscribe(() => {
-    console.log('store: ', store.getState().tasks);
-    AsyncStorage.setItem('@TASKS', JSON.stringify(store.getState().tasks));
-});
+// store.subscribe(() => {
+//     console.log('store: ', store.getState().tasks);
+//     AsyncStorage.setItem('@TASKS', JSON.stringify(store.getState().tasks));
+// });
