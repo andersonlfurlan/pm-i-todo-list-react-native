@@ -1,19 +1,29 @@
 import { View, ScrollView, Text, StyleSheet } from "react-native";
-import { Button as PButton } from "react-native-paper";
+import { Button as PButton, Snackbar } from "react-native-paper";
 import { globalStyles } from "../styles/globalStyles.jsx";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { fetchTasks, removeTaskAsync, finishTaskAsync, clearAllTasksAsync, selectTasks } from '../store/features/taskSlice.js';
+import {
+  fetchTasks,
+  removeTaskAsync,
+  finishTaskAsync,
+  clearAllTasksAsync,
+  selectTasks,
+  selectError,
+} from "../store/features/taskSlice.js";
 
 export default function TaskList() {
   const navigation = useNavigation();
   const tasks = useSelector(selectTasks);
+  const error = useSelector(selectError);
   const dispatch = useDispatch();
+
+  console.log(error);
+
   useEffect(() => {
     dispatch(fetchTasks());
   }, [dispatch]);
-
 
   const onClickTaskHandler = (task) => {
     dispatch(finishTaskAsync({ ...task, done: !task.done }));
@@ -24,10 +34,10 @@ export default function TaskList() {
   };
 
   const onClickDetailHandler = (task) => {
-    navigation.navigate('TaskDetail', {
+    navigation.navigate("TaskDetail", {
       task,
-    })
-  }
+    });
+  };
 
   const onRemoveAllHandler = () => {
     dispatch(clearAllTasksAsync());
@@ -36,9 +46,11 @@ export default function TaskList() {
   return (
     <>
       <View style={styles.removeAllContainer}>
-        <PButton icon="plus" mode="contained" onPress={
-          () => navigation.navigate('TaskForm')
-        }>
+        <PButton
+          icon="plus"
+          mode="contained"
+          onPress={() => navigation.navigate("TaskForm")}
+        >
           Adicionar
         </PButton>
         <PButton icon="trash-can" mode="contained" onPress={onRemoveAllHandler}>
@@ -54,7 +66,8 @@ export default function TaskList() {
                 <View style={globalStyles.taskItemButtons}>
                   <PButton
                     mode="contained-tonal"
-                    onPress={() => onClickDetailHandler(task)}>
+                    onPress={() => onClickDetailHandler(task)}
+                  >
                     Detalhes
                   </PButton>
                   <PButton
@@ -74,6 +87,8 @@ export default function TaskList() {
             );
           })}
         </ScrollView>
+        <Snackbar visible={!!error}>{error}</Snackbar>
+
       </View>
     </>
   );
@@ -81,12 +96,13 @@ export default function TaskList() {
 
 const finishedTask = "darkseagreen";
 const pendingTask = "indianred";
-const taskStatus = (task, pending, finished) => task.done ? finished : pending;
+const taskStatus = (task, pending, finished) =>
+  task.done ? finished : pending;
 
 const styles = StyleSheet.create({
   taskItem: (task) => ({
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     gap: 10,
     borderWidth: 1,
     padding: 16,
@@ -99,7 +115,7 @@ const styles = StyleSheet.create({
   }),
   taskItemText: (task) => ({
     marginTop: 10,
-    textDecorationLine: taskStatus(task, 'none', "line-through"),
+    textDecorationLine: taskStatus(task, "none", "line-through"),
     marginLeft: 10,
   }),
   taskListContainer: {
@@ -109,8 +125,8 @@ const styles = StyleSheet.create({
   },
   removeAllContainer: {
     padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 10
-  }
-})
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 10,
+  },
+});

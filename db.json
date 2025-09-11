@@ -1,3 +1,11 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "id": "7ca1",
+      "name": "Tarefa 1",
+      "description": "Descrição da Tarefa 1",
+      "done": false,
+      "createdDate": "2025-09-11T03:29:40.744Z"
+    }
+  ]
 }

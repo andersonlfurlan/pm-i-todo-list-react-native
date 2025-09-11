@@ -47,7 +47,8 @@ const taskSlice = createSlice({
             })
             .addCase(fetchTasks.rejected, (state, { error }) => {
                 state.loading = false;
-                state.error = error.message;
+                state.error = 'Erro ao listar tarefas';
+                console.error('Fetch tasks failed: ', error);
             })
             .addCase(addTaskAsync.fulfilled, (state, { payload }) => {
                 state.tasks.push(payload);

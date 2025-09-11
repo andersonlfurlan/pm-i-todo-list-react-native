@@ -1,57 +1,80 @@
-import { useState } from "react";
-import { View, StyleSheet, TextInput } from "react-native";
+import { View, StyleSheet, TextInput, Text } from "react-native";
 import { Button as PButton } from "react-native-paper";
 import { globalStyles } from "../styles/globalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { addTaskAsync } from "../store/features/taskSlice";
+import * as Yup from 'yup';
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+const schema = Yup.object().shape({
+  name: Yup.string().required('O nome da tarefa é obrigatório').min(5, 'O nome da tarefa deve ter pelo menos 5 caracteres').default(''),
+  description: Yup.string().required('A descrição da tarefa é obrigatória').min(10, 'A descrição da tarefa deve ter pelo menos 10 caracteres').default(''),
+});
 
 export default function TaskRegister() {
-  const [taskName, setTaskName] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
+
+  const form = useForm({ 
+    resolver: yupResolver(schema),
+    defaultValues: schema.getDefault(),
+    mode: 'onBlur'
+   });
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const onChangeNameHandler = (name) => {
-    setTaskName(name);
-  };
 
-  const onChangeDescriptionHandler = (description) => {
-    setTaskDescription(description);
-  };
-
-  const onPressHandler = () => {
+  const onSubmit = (data) => {
     const newTask = {
-      name: taskName,
-      description: taskDescription,
+      name: data.name,
+      description: data.description,
       done: false,
     };
     dispatch(addTaskAsync(newTask));
-    setTaskName("");
-    setTaskDescription("");
+    form.reset();
     navigation.navigate('TaskList');
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.taskInput}
-          value={taskName}
-          onChangeText={onChangeNameHandler}
-          placeholder="Digite o nome da tarefa"
+        <Controller 
+          control={form.control}
+          name="name"
+          render={({field}) => (
+            <>
+              <TextInput
+                style={styles.taskInput}
+                value={field.value}
+                onChangeText={field.onChange}
+                placeholder="Digite o nome da tarefa"
+                onBlur={field.onBlur}
+                />
+              {form.formState.errors.name && <Text style={{color: 'red'}}>{form.formState.errors.name.message}</Text>}
+            </>
+          )} 
         />
-        <TextInput
-          style={styles.taskInput}
-          value={taskDescription}
-          onChangeText={onChangeDescriptionHandler}
-          placeholder="Digite a descrição da tarefa"
-          multiline
-          numberOfLines={3}
+        <Controller 
+          control={form.control}
+          name="description"  
+          render={({field}) => (
+            <>
+              <TextInput
+                style={styles.taskInput}
+                value={field.value}
+                onChangeText={field.onChange} 
+                placeholder="Digite a descrição da tarefa"
+                multiline
+                numberOfLines={5}
+                onBlur={field.onBlur}
+              />
+              {form.formState.errors.description && <Text style={{color: 'red'}}>{form.formState.errors.description.message}</Text>}
+            </>
+          )}
         />
       </View>
       <View style={globalStyles.taskItemButtons}>
-        <PButton icon="plus" mode="contained" onPress={onPressHandler}>
+        <PButton icon="plus" mode="contained" onPress={form.handleSubmit(onSubmit)}>
           Adicionar
         </PButton>
       </View>
