@@ -1,26 +1,26 @@
 import { View, ScrollView, Text, StyleSheet } from "react-native";
-import { Button as PButton } from "react-native-paper";
+import { Button as PButton, ActivityIndicator } from "react-native-paper";
 
 import { globalStyles } from "../styles/globalStyles.jsx";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { finishTask, initTasks, removeAllTasks, removeTask, selectTasks } from '../store/features/taskSlice.js'
+import { finishTask, initTasks, removeAllTasks, removeTask, selectTasks, selectError, selectLoading } from '../store/features/taskSlice.js'
 import { useEffect } from "react";
 import taskService from "../services/taskService.js";
 
 export default function TaskList() {
   const navigation = useNavigation();
   const tasks = useSelector(selectTasks);
+  const error = useSelector(selectError);
+  const loading = useSelector(selectLoading)
+
   const dispatch = useDispatch();
   console.log('tasks: ', tasks);
+  console.log('error: ', error);
+  console.log('loading: ', loading);
 
   useEffect(() => {
-    const loadTasks = async () => {
-      const storedTasks = await taskService.getTasks();
-      console.log('storedTasks: ', storedTasks);
-      dispatch(initTasks(storedTasks)); 
-    };
-    loadTasks();
+    dispatch(initTasks());
   }, [dispatch]);
 
 
@@ -42,6 +42,9 @@ export default function TaskList() {
 
   return (
     <>
+      {error && <View>
+        <Text> {error} </Text>
+      </View>}
       <View style={styles.removeAllContainer}>
         <PButton icon="plus" mode="contained" onPress={
           () => navigation.navigate('TaskForm')
@@ -52,9 +55,12 @@ export default function TaskList() {
           Excluir tudo
         </PButton>
       </View>
+      {loading && <View style={styles.loadingIndicator}>
+        <ActivityIndicator animating={true} />
+      </View>}
       <View style={styles.taskListContainer}>
         <ScrollView>
-          {tasks.map((task) => {
+          {tasks?.map((task) => {
             return (
               <View style={styles.taskItem(task)} key={task.id}>
                 <Text style={styles.taskItemText(task)}> {task.name}</Text>
@@ -91,6 +97,9 @@ const pendingTask = "indianred";
 const taskStatus = (task, pending, finished) => task.done ? finished : pending;
 
 const styles = StyleSheet.create({
+  loadingIndicator: {
+    marginBottom: 16,
+  },  
   taskItem: (task) => ({
     flexDirection: 'row',
     justifyContent: 'space-between',
