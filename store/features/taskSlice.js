@@ -5,6 +5,10 @@ export const initTasks = createAsyncThunk('tasks/fetch', async () => {
     return await taskService.getTasks();
 });
 
+export const addTask = createAsyncThunk('tasks/add', async (payload) => {
+    return await taskService.addTask(payload);
+});
+
 const taskSlice = createSlice({
     name: 'tasks',
     initialState: {
@@ -13,11 +17,6 @@ const taskSlice = createSlice({
         loading: false, 
     },
     reducers: {
-        addTask(state, { payload }) {
-            payload.id = new Date().toISOString();
-            payload.createdDate = new Date();
-            state.tasks.push(payload);
-        },
         removeTask(state, { payload }) {
             state.tasks = state.tasks.filter(t => t.id !== payload.id);
         },
@@ -56,6 +55,9 @@ const taskSlice = createSlice({
                 state.tasks = [];
                 state.error = null;
             })
+            .addCase(addTask.fulfilled, (state, { payload }) => {
+                state.tasks.push(payload);
+            });
     },
     selectors: {
         selectTasks: (state) => state.tasks,
@@ -63,7 +65,7 @@ const taskSlice = createSlice({
         selectLoading: (state) => state.loading,
     }
 });
-export const { addTask, removeTask, removeAllTasks, finishTask } = taskSlice.actions;
+export const { removeTask, removeAllTasks, finishTask } = taskSlice.actions;
 export const { selectTasks, selectError, selectLoading } = taskSlice.selectors;
 export const tasksReducer = taskSlice.reducer;
 
