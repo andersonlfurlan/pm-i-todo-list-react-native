@@ -20,7 +20,7 @@ const addTask = async (newTask) => {
 }
 
 const removeTask = async (task) => {
-
+    return (await api.delete(`${endpoint}/${task.id}`)).data;
 }
 
 const finishTask = async (taskDone) => {

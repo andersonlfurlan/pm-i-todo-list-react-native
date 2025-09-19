@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, rejectedWithValue } from "@reduxjs/toolkit";
 import taskService from "../../services/taskService";
 
 export const initTasks = createAsyncThunk('tasks/fetch', async () => {
@@ -9,17 +9,19 @@ export const addTask = createAsyncThunk('tasks/add', async (payload) => {
     return await taskService.addTask(payload);
 });
 
+export const removeTask = createAsyncThunk('tasks/remove', async (payload) => {
+    const response = await taskService.removeTask(payload);
+    return response;
+});
+
 const taskSlice = createSlice({
     name: 'tasks',
     initialState: {
         tasks: [],
         error: null,
-        loading: false, 
+        loading: false,
     },
     reducers: {
-        removeTask(state, { payload }) {
-            state.tasks = state.tasks.filter(t => t.id !== payload.id);
-        },
         removeAllTasks(state) { state.tasks = []; },
         finishTask(state, { payload }) {
             const taskToBeDone = { ...payload };
@@ -57,6 +59,18 @@ const taskSlice = createSlice({
             })
             .addCase(addTask.fulfilled, (state, { payload }) => {
                 state.tasks.push(payload);
+            })
+            .addCase(removeTask.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(removeTask.fulfilled, (state, { payload }) => {
+                state.tasks = state.tasks.filter(t => t.id !== payload.id);
+                state.error = null;
+                state.loading = false;
+            })
+            .addCase(removeTask.rejected, (state) => {
+                state.error = 'Erro ao remover tarefa ';
+                state.loading = false;
             });
     },
     selectors: {
@@ -65,7 +79,7 @@ const taskSlice = createSlice({
         selectLoading: (state) => state.loading,
     }
 });
-export const { removeTask, removeAllTasks, finishTask } = taskSlice.actions;
+export const { removeAllTasks, finishTask } = taskSlice.actions;
 export const { selectTasks, selectError, selectLoading } = taskSlice.selectors;
 export const tasksReducer = taskSlice.reducer;
 
