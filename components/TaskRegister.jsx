@@ -1,16 +1,26 @@
 import { useState } from "react";
-import { View, StyleSheet, TextInput } from "react-native";
+import { View, StyleSheet, TextInput, Text } from "react-native";
 import { Button as PButton } from "react-native-paper";
 import { globalStyles } from "../styles/globalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { addTask } from "../store/features/taskSlice";
 
+import * as Yup from 'yup';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from "@hookform/resolvers/yup";
+
 export default function TaskRegister() {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  const form = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: schema.getDefault(),
+    mode: 'onBlur'
+  })
 
   const onChangeNameHandler = (name) => {
     setTaskName(name);
@@ -27,31 +37,48 @@ export default function TaskRegister() {
       done: false,
     };
     dispatch(addTask(newTask));
-    setTaskName("");
-    setTaskDescription("");
-    navigation.navigate('TaskList');
+    // setTaskName("");
+    // setTaskDescription("");
+    form.reset();
+    // navigation.navigate('TaskList');
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.taskInput}
-          value={taskName}
-          onChangeText={onChangeNameHandler}
-          placeholder="Digite o nome da tarefa"
-        />
-        <TextInput
-          style={styles.taskInput}
-          value={taskDescription}
-          onChangeText={onChangeDescriptionHandler}
-          placeholder="Digite a descrição da tarefa"
-          multiline
-          numberOfLines={3}
-        />
+        <Controller control={form.control} name="name"
+          render={
+            ({ field }) =>
+              <>
+                <TextInput
+                  style={styles.taskInput}
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder="Digite o nome da tarefa"
+                />
+                <Text style={{ color: 'red' }}>
+                  {form.formState.errors.name?.message}
+                </Text>
+              </>
+          }
+        >
+
+        </Controller>
+        {/* <Controller control={form.control} name="description">
+          <TextInput
+            style={styles.taskInput}
+            value={taskDescription}
+            onChangeText={onChangeDescriptionHandler}
+            placeholder="Digite a descrição da tarefa"
+            multiline
+            numberOfLines={3}
+          />
+        </Controller> */}
       </View>
       <View style={globalStyles.taskItemButtons}>
-        <PButton icon="plus" mode="contained" onPress={onPressHandler}>
+        <PButton ion="plus" mode="contained" onPress={form.handleSubmit(onPressHandler)}
+          disabled={!form.formState.isValid}>
           Adicionar
         </PButton>
       </View>
@@ -78,3 +105,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+const schema = Yup.object().shape({
+  name: Yup.string()
+    .required('O nome da tarefa é obrigatório')
+    .min(5, 'O nome da tarefa deve conter no mínimo 5 caracteres')
+    .max(100, 'O nome da tarefa deve conter no máximo 100 caracteres')
+    .default(''),
+  description: Yup.string().default(''),
+})
