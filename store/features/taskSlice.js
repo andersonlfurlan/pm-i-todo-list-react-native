@@ -14,6 +14,11 @@ export const removeTask = createAsyncThunk('tasks/remove', async (payload) => {
     return response;
 });
 
+export const finishTask = createAsyncThunk('tasks/finish', async (payload) => {
+    return await taskService.finishTask({ ...payload });
+})
+
+
 const taskSlice = createSlice({
     name: 'tasks',
     initialState: {
@@ -23,20 +28,6 @@ const taskSlice = createSlice({
     },
     reducers: {
         removeAllTasks(state) { state.tasks = []; },
-        finishTask(state, { payload }) {
-            const taskToBeDone = { ...payload };
-            taskToBeDone.done = !taskToBeDone.done;
-            if (taskToBeDone.done) {
-                taskToBeDone.completedDate = new Date();
-            } else {
-                delete taskToBeDone.completedDate;
-            }
-            state.tasks = state.tasks.map((t) => {
-                return t.id === taskToBeDone.id
-                    ? taskToBeDone
-                    : t;
-            })
-        }
     },
     extraReducers: (builder) => {
         builder
@@ -71,6 +62,11 @@ const taskSlice = createSlice({
             .addCase(removeTask.rejected, (state) => {
                 state.error = 'Erro ao remover tarefa ';
                 state.loading = false;
+            })
+            .addCase(finishTask.fulfilled, (state, { payload }) => {
+                state.tasks = state.tasks.map((t) => {
+                    return (t.id === payload.id) ? payload : t;
+                })
             });
     },
     selectors: {
@@ -79,7 +75,7 @@ const taskSlice = createSlice({
         selectLoading: (state) => state.loading,
     }
 });
-export const { removeAllTasks, finishTask } = taskSlice.actions;
+export const { removeAllTasks } = taskSlice.actions;
 export const { selectTasks, selectError, selectLoading } = taskSlice.selectors;
 export const tasksReducer = taskSlice.reducer;
 

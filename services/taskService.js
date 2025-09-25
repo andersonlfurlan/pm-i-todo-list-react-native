@@ -23,8 +23,15 @@ const removeTask = async (task) => {
     return (await api.delete(`${endpoint}/${task.id}`)).data;
 }
 
-const finishTask = async (taskDone) => {
-
+const finishTask = async (taskToBeDone) => {
+    taskToBeDone.done = !taskToBeDone.done;
+    if (taskToBeDone.done) {
+        taskToBeDone.completedDate = new Date();
+    } else {
+        delete taskToBeDone.completedDate;
+    }
+    const response = await api.put(`${endpoint}/${taskToBeDone.id}`, taskToBeDone);
+    return response.data;
 }
 
 const clearTasks = () => {

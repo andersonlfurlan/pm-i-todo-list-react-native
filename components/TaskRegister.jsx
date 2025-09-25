@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, StyleSheet, TextInput, Text } from "react-native";
-import { Button as PButton } from "react-native-paper";
+import { Button as PButton, ToggleButton } from "react-native-paper";
 import { globalStyles } from "../styles/globalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -11,8 +11,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 
 export default function TaskRegister() {
-  const [taskName, setTaskName] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -22,25 +20,16 @@ export default function TaskRegister() {
     mode: 'onBlur'
   })
 
-  const onChangeNameHandler = (name) => {
-    setTaskName(name);
-  };
-
-  const onChangeDescriptionHandler = (description) => {
-    setTaskDescription(description);
-  };
-
-  const onPressHandler = () => {
+  const onPressHandler = (dataForm) => {
+    console.log(dataForm);
     const newTask = {
-      name: taskName,
-      description: taskDescription,
-      done: false,
+      name: dataForm.name,
+      description: dataForm.description,
+      done: dataForm.done,
     };
     dispatch(addTask(newTask));
-    // setTaskName("");
-    // setTaskDescription("");
     form.reset();
-    // navigation.navigate('TaskList');
+    navigation.navigate('TaskList');
   };
 
   return (
@@ -63,18 +52,47 @@ export default function TaskRegister() {
               </>
           }
         >
+        </Controller>
+        <Controller control={form.control} name="description"
+          render={
+            ({ field }) => {
+              return (
+                <>
+                  <TextInput
+                    style={styles.taskInput}
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder="Digite a descrição da tarefa"
+                    multiline
+                    numberOfLines={3}
+                  />
+                  <Text style={{ color: 'red' }}>
+                    {form.formState.errors.description?.message}
+                  </Text>
+                </>
+
+              )
+
+            }
+          }
+        >
 
         </Controller>
-        {/* <Controller control={form.control} name="description">
-          <TextInput
-            style={styles.taskInput}
-            value={taskDescription}
-            onChangeText={onChangeDescriptionHandler}
-            placeholder="Digite a descrição da tarefa"
-            multiline
-            numberOfLines={3}
-          />
-        </Controller> */}
+        <Controller control={form.control} name="done" render={
+          ({ field }) => {
+            return (
+              <ToggleButton.Row value={field.value} onValueChange={field.onChange}>
+                <ToggleButton icon="check-circle" value={true}>
+                </ToggleButton>
+                <ToggleButton icon="close-circle" value={false}>
+                </ToggleButton>
+              </ToggleButton.Row>
+            )
+          }
+        }>
+
+        </Controller>
       </View>
       <View style={globalStyles.taskItemButtons}>
         <PButton ion="plus" mode="contained" onPress={form.handleSubmit(onPressHandler)}
@@ -112,5 +130,9 @@ const schema = Yup.object().shape({
     .min(5, 'O nome da tarefa deve conter no mínimo 5 caracteres')
     .max(100, 'O nome da tarefa deve conter no máximo 100 caracteres')
     .default(''),
-  description: Yup.string().default(''),
+  description: Yup.string()
+    .min(10, 'A descrição da tarefa deve conter 10 caracteres')
+    .max(200, 'A descrição da tarefa deve conter no máximo 200 caracteres')
+    .default(''),
+  done: Yup.boolean().default(false)
 })
