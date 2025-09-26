@@ -82,12 +82,21 @@ export default function TaskRegister() {
         <Controller control={form.control} name="done" render={
           ({ field }) => {
             return (
-              <ToggleButton.Row value={field.value} onValueChange={field.onChange}>
-                <ToggleButton icon="check-circle" value={true}>
-                </ToggleButton>
-                <ToggleButton icon="close-circle" value={false}>
-                </ToggleButton>
-              </ToggleButton.Row>
+              <>
+                <ToggleButton.Row value={field.value} onValueChange={(value) => {
+                  if (value !== null) {
+                    field.onChange(value)
+                  }
+                }}>
+                  <ToggleButton icon="check-circle" value={true}>
+                  </ToggleButton>
+                  <ToggleButton icon="close-circle" value={false}>
+                  </ToggleButton>
+                </ToggleButton.Row>
+                <View>
+                  <Text>Text: {field.value?.toString()}</Text>
+                </View>
+              </>
             )
           }
         }>
