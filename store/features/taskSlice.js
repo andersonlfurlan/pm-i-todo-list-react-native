@@ -9,9 +9,13 @@ export const addTask = createAsyncThunk('tasks/add', async (payload) => {
     return await taskService.addTask(payload);
 });
 
-export const removeTask = createAsyncThunk('tasks/remove', async (payload) => {
-    const response = await taskService.removeTask(payload);
-    return response;
+export const removeTask = createAsyncThunk('tasks/remove', async (payload, thunkAPI) => {
+    try {
+        const response = await taskService.removeTask(payload);
+        return response;
+    } catch (error) {
+        return thunkAPI.rejectedWithValue({ payload: 'Error' });
+    }
 });
 
 export const finishTask = createAsyncThunk('tasks/finish', async (payload) => {
@@ -23,7 +27,10 @@ const taskSlice = createSlice({
     name: 'tasks',
     initialState: {
         tasks: [],
-        error: null,
+        error: {
+            list: null,
+            register: null
+        },
         loading: false,
     },
     reducers: {
@@ -34,10 +41,10 @@ const taskSlice = createSlice({
             .addCase(initTasks.fulfilled, (state, { payload }) => {
                 state.tasks = payload;
                 state.loading = false;
-                state.error = null;
+                state.error.list = null;
             })
             .addCase(initTasks.rejected, (state, { payload }) => {
-                state.error = 'Erro ao carregar lista de tarefas';
+                state.error.list = 'Erro ao carregar lista de tarefas';
                 state.loading = false;
                 state.tasks = [];
                 console.error(payload);
@@ -46,21 +53,28 @@ const taskSlice = createSlice({
             .addCase(initTasks.pending, (state) => {
                 state.loading = true;
                 state.tasks = [];
-                state.error = null;
+                state.error.list = null;
+            })
+            .addCase(addTask.pending, (state) => {
+                state.error.register = null;
+            })
+            .addCase(addTask.rejected, (state,) => {
+                state.error.register = 'Erro ao salvar a tarefa';
             })
             .addCase(addTask.fulfilled, (state, { payload }) => {
                 state.tasks.push(payload);
+                state.error.register = null;
             })
             .addCase(removeTask.pending, (state) => {
                 state.loading = true;
             })
             .addCase(removeTask.fulfilled, (state, { payload }) => {
                 state.tasks = state.tasks.filter(t => t.id !== payload.id);
-                state.error = null;
+                state.error.list = null;
                 state.loading = false;
             })
-            .addCase(removeTask.rejected, (state) => {
-                state.error = 'Erro ao remover tarefa ';
+            .addCase(removeTask.rejected, (state, payload, rejectValue) => {
+                state.error.list = 'Erro ao remover tarefa ';
                 state.loading = false;
             })
             .addCase(finishTask.fulfilled, (state, { payload }) => {

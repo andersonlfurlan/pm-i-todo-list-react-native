@@ -42,8 +42,8 @@ export default function TaskList() {
 
   return (
     <>
-      {error && <View>
-        <Text> {error} </Text>
+      {(error.list || error.register) && <View>
+        <Text> {error.list || error.register} </Text>
       </View>}
       <View style={styles.removeAllContainer}>
         <PButton icon="plus" mode="contained" onPress={
