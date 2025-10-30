@@ -12,6 +12,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TaskListScreen from './screens/TaskListScreen';
 import TaskFormScreen from './screens/TaskFormScreen';
 import TaskHomeScreen from "./screens/TaskHomeScreen";
+import CategoryListScreen from './screens/CategoryListScreen';
+import CategoryFormScreen from './screens/CategoryFormScreen';
 import TaskDetailScreen from "./screens/TaskDetailScreen";
 
 import { Provider as ReduxProvider, useDispatch } from "react-redux";
@@ -29,6 +31,8 @@ export default function App() {
             <Stack.Screen name="TaskList" component={TaskListScreen}></Stack.Screen>
             <Stack.Screen name="TaskForm" component={TaskFormScreen}></Stack.Screen>
             <Stack.Screen name="TaskDetail" component={TaskDetailScreen}></Stack.Screen>
+            <Stack.Screen name="CategoryList" component={CategoryListScreen}></Stack.Screen>
+            <Stack.Screen name="CategoryForm" component={CategoryFormScreen}></Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
     </ReduxProvider>

@@ -16,5 +16,25 @@
       "createdDate": "2025-09-04T22:56:11.663Z"
     }
   ],
-  "reminders": []
+  "reminders": [],
+  "categories": [
+    {
+      "id": "0da2",
+      "name": "Categoria 1",
+      "priority": 1,
+      "description": "Categoria 1 Descrição"
+    },
+    {
+      "id": "ff23",
+      "description": " Categoria 2 Descrição",
+      "priority": 2,
+      "name": "Categoria 2 Descrição"
+    },
+    {
+      "id": "dcd9",
+      "name": "Categoria 3",
+      "priority": 3,
+      "description": " Categoria 3 Descrição"
+    }
+  ]
 }

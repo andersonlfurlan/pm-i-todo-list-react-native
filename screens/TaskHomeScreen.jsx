@@ -18,6 +18,9 @@ export default function TaskHomeScreen() {
             <Button mode='contained' onPress={() => navigate('TaskForm')}>
                 Cadastro
             </Button>
+            <Button mode='contained' onPress={() => navigate('CategoryList')}>
+                Categorias
+            </Button>
         </View>
     </View>
 }
